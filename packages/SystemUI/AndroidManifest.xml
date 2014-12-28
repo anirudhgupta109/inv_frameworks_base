@@ -205,7 +205,6 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
-    <uses-permission android:name="android.permission.ACCESS_SURFACE_FLINGER" />
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
     <uses-permission android:name="android.permission.SET_ACTIVITY_WATCHER" />
     <uses-permission android:name="android.permission.SHUTDOWN" />
@@ -213,6 +212,9 @@
     <!-- Reboot -->
     <uses-permission android:name="android.permission.REBOOT" />
     <uses-permission android:name="android.permission.RECOVERY" />
+
+    <!-- du screenshot and screenrecord -->
+    <uses-permission android:name="android.permission.ACCESS_SURFACE_FLINGER" />
 
     <application
         android:name=".SystemUIApplication"
@@ -280,6 +282,12 @@
                 <action android:name="com.android.systemui.action.REFRESH_SOUND" />
             </intent-filter>
         </receiver>
+
+        <!-- started from PhoneWindowManager
+             TODO: Should have an android:permission attribute -->
+        <service android:name=".screenrecord.TakeScreenrecordService"
+            android:process=":screenrecord"
+            android:exported="false" />
 
         <service android:name=".ImageWallpaper"
                 android:permission="android.permission.BIND_WALLPAPER"
