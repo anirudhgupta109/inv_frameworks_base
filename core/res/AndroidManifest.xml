@@ -555,6 +555,9 @@
     <protected-broadcast android:name="com.android.systemui.action.RESTART_THEME" />
     <protected-broadcast android:name="com.android.systemui.action.REFRESH_SOUND" />
 
+    <!-- Volume steps -->
+    <protected-broadcast android:name="android.media.VOLUME_STEPS_CHANGED_ACTION" />
+
     <!-- ====================================================================== -->
     <!--                          RUNTIME PERMISSIONS                           -->
     <!-- ====================================================================== -->
