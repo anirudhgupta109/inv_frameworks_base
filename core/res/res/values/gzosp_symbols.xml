@@ -26,4 +26,7 @@
     <!-- Doze always on default value -->
     <java-symbol type="bool" name="config_dozeAlwaysOnDisplayEnabledDefault" />
 
+    <!-- Hardware key binding -->
+    <java-symbol type="integer" name="config_deviceHardwareKeys" />
+
 </resources>
