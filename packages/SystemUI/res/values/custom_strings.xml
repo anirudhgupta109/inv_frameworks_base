@@ -67,4 +67,10 @@
     <!-- Ambient display and lift gesture Tile -->
     <string name="quick_settings_doze_notifications_label">Ambient notifications</string>
 
+     <!-- Sound QS Tile -->
+     <string name="quick_settings_sound_label">Sound</string>
+     <string name="quick_settings_sound_ring">Ring</string>
+     <string name="quick_settings_sound_vibrate">Vibrate</string>
+     <string name="quick_settings_sound_dnd">Do not disturb</string>
+
 </resources>
