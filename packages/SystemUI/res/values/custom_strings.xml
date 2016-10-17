@@ -44,4 +44,11 @@
 
     <!-- Shows when people have clicked on the custom lockscreen shortcut [CHAR LIMIT=60] -->
     <string name="custom_hint">Swipe from icon to launch</string>
+
+    <!-- Navigation bar Tile -->
+    <string name="quick_settings_navigation_bar">Navigation bar</string>
+    <string name="quick_settings_smartbar">SmartBar</string>
+    <string name="quick_settings_fling">Fling</string>
+    <string name="quick_settings_navigation_default">Stock</string>
+    <string name="quick_settings_navigation_disabled">Disabled</string>
 </resources>
