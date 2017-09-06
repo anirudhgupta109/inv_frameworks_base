@@ -390,6 +390,11 @@
     <!-- Content description of the airplane mode icon for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
     <string name="accessibility_airplane_mode">Airplane mode.</string>
 
+    <!-- Caffeine QS Tile -->
+    <string name="quick_settings_caffeine_label">Caffeine</string>
+    <string name="accessibility_quick_settings_caffeine_off">Caffeine off</string>
+    <string name="accessibility_quick_settings_caffeine_on">Caffeine on</string>
+
     <!-- Content description of the VPN icon for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
     <string name="accessibility_vpn_on">VPN on.</string>
 
