@@ -4572,8 +4572,8 @@ message MetricsEvent {
     // Add new aosp constants above this line.
     // END OF AOSP CONSTANTS
 
-    //CarbonFibers
-    CARBONFIBERS = 1200;
+    //Custom QS
+    CUSTOM_QS = 1200;
 
   }
 }
