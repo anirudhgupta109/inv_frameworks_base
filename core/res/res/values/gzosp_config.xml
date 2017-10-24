@@ -49,4 +49,22 @@
     <!-- Button brightness -->
     <bool name="config_button_brightness_support">false</bool>
     <integer name="config_button_brightness_default">128</integer>
+
+    <!-- Defines the default set of global actions. Actions may still be disabled or hidden based
+         on the current state of the device.
+         Each item must be one of the following strings:
+         "power" = Power off
+         "settings" = An action to launch settings
+         "airplane" = Airplane mode toggle
+         "silent" = silent mode
+         "restart" = restart device
+         -->
+    <string-array translatable="false" name="config_globalActionsList_custom">
+        <item>power</item>
+        <item>restart</item>
+        <item>airplane</item>
+        <item>settings</item>
+        <item>lockdown</item>
+        <item>silent</item>
+    </string-array>
 </resources>

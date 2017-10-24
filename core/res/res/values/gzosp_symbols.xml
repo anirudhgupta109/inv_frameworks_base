@@ -32,4 +32,7 @@
     <!-- Button brightness -->
     <java-symbol type="bool" name="config_button_brightness_support" />
     <java-symbol type="integer" name="config_button_brightness_default" />
+
+    <!-- Power menu -->
+    <java-symbol type="array" name="config_globalActionsList_custom" />
 </resources>
