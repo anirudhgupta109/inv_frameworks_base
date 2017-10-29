@@ -4040,6 +4040,8 @@ public abstract class Context {
     @SystemApi
     public static final String VR_SERVICE = "vrmanager";
 
+    public static final String INTERFACER_SERVICE = "interfacer";
+
     /**
      * Use with {@link #getSystemService} to retrieve an
      * {@link android.app.timezone.ITimeZoneRulesManager}.
