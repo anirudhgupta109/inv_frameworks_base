@@ -2065,10 +2065,4 @@
      can't verify user consent. [CHAR LIMIT=NONE] -->
     <string name="touch_filtered_warning">Because an app is obscuring a permission request, Settings
         can’t verify your response.</string>
-
-     <!-- Recents Panel -->
-     <!-- The text for the button in the notification window-shade that clears
-          all of the currently visible notifications. [CHAR LIMIT=10]-->
-     <string name="clear_recents">Close all recent</string>
-
 </resources>
