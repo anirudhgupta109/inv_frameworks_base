@@ -77,4 +77,7 @@
     <java-symbol type="color" name="screen_pinning_toast_light_background_color" />
     <java-symbol type="color" name="screen_pinning_toast_light_text_color" />
 
+    <!-- Platform Signatures -->
+    <java-symbol type="array" name="config_vendorPlatformSignatures" />
+
 </resources>
