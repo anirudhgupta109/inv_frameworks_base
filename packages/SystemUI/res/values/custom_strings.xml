@@ -34,4 +34,5 @@
     <string name="lockscreen_tuner_activity">Lockscreen shortcuts</string>
     <string name="powernotif_tuner_activity">Power notifications</string>
 
+    <string name="status_bar_roaming">Roaming</string>
 </resources>
