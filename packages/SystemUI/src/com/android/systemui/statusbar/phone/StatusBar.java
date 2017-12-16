@@ -1767,6 +1767,13 @@ public class StatusBar extends SystemUI implements DemoMode,
         }
     }
 
+    private void refreshTicker() {
+        haltTicker();
+        if (mStatusBarView != null && mTickerEnabled != 0 && mTicker != null) {
+                mTicker.setStatusBarView(mStatusBarView);
+        }
+    }
+
     public int getStatusBarHeight() {
         if (mNaturalBarHeight < 0) {
             final Resources res = mContext.getResources();
@@ -4221,6 +4228,8 @@ public class StatusBar extends SystemUI implements DemoMode,
 
         updateRowStates();
         mScreenPinningRequest.onConfigurationChanged();
+
+        refreshTicker();
     }
 
     public void userSwitched(int newUserId) {
