@@ -34,5 +34,5 @@
     <java-symbol type="integer" name="config_button_brightness_default" />
 
     <!-- Power menu -->
-    <java-symbol type="array" name="config_globalActionsList_custom" />
+    <java-symbol type="array" name="config_custom_globalActionsList" />
 </resources>
