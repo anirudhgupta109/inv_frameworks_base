@@ -4001,8 +4001,14 @@ public final class Settings {
         public static final String POWERMENU_SOUNDPANEL = "powermenu_soundpanel";
 
         /**
-         * Whether to display settings option in the power menu
+         * Whether to display the power menu dialog while on the lockscreen
          *
+         * @hide
+         */
+        public static final String POWERMENU_LOCKSCREEN = "powermenu_lockscreen";
+
+        /**
+         * Whether to display settings option in the power menu
          * @hide
          */
         public static final String POWERMENU_SETTINGS = "powermenu_settings";
