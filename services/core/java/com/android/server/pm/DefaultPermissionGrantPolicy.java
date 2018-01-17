@@ -855,6 +855,13 @@ final class DefaultPermissionGrantPolicy {
                 grantRuntimePermissionsLPw(vendingPackage, STORAGE_PERMISSIONS, userId);
             }
 
+            // Invictrix Updater
+            PackageParser.Package invUpdatePackage = getSystemPackageLPr(
+                    "com.invictrixrom.updater");
+            if (invUpdatePackage != null && doesPackageSupportRuntimePermissions(invUpdatePackage)) {
+                grantRuntimePermissionsLPw(invUpdatePackage, STORAGE_PERMISSIONS, true, userId);
+            }
+            
             // Project Fi
             PackageParser.Package fiPackage = getDefaultProviderAuthorityPackageLPr(
                     "com.google.android.apps.tycho", userId);
