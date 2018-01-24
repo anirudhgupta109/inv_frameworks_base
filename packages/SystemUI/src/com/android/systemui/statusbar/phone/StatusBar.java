@@ -597,6 +597,7 @@ public class StatusBar extends SystemUI implements DemoMode,
     protected PorterDuffXfermode mSrcOverXferMode =
             new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER);
 
+    private Entry mEntryToRefresh;
     private String[] mNavMediaArrowsExcludeList;
     private MediaSessionManager mMediaSessionManager;
     private MediaController mMediaController;
@@ -639,24 +640,44 @@ public class StatusBar extends SystemUI implements DemoMode,
         }
     };
 
-    public void setMediaPlaying() {
-        if (mNavigationBar != null) {
-            if (PlaybackState.STATE_PLAYING ==
-                    getMediaControllerPlaybackState(mMediaController)
-                    || PlaybackState.STATE_BUFFERING ==
-                    getMediaControllerPlaybackState(mMediaController)) {
-                final String currentPkg = mMediaController.getPackageName().toLowerCase();
-                for (String packageName : mNavMediaArrowsExcludeList) {
-                    if (currentPkg.contains(packageName)) {
-                        return;
-                    }
-                }
-                mNavigationBar.setMediaPlaying(true);
-            } else {
-                mNavigationBar.setMediaPlaying(false);
-            }
-        }
-    }
+	public void setMediaPlaying() {
+		if (PlaybackState.STATE_PLAYING == getMediaControllerPlaybackState(mMediaController)
+				|| PlaybackState.STATE_BUFFERING == getMediaControllerPlaybackState(mMediaController)) {
+			tickTrackInfo(mMediaController);
+			final String currentPkg = mMediaController.getPackageName().toLowerCase();
+			for (String packageName : mNavMediaArrowsExcludeList) {
+				if (currentPkg.contains(packageName)) {
+					return;
+				}
+			}
+			if (mNavigationBar != null) {
+				// pulse colors already set by titckTrackInfo
+				mNavigationBar.setMediaPlaying(true);
+			}
+		} else {
+			if (mNavigationBar != null) {
+				mNavigationBar.setMediaPlaying(false);
+			}
+		}
+	}
+
+	private void tickTrackInfo(MediaController mc) {
+		ArrayList<Entry> activeNotifications = mNotificationData.getAllNotifications();
+		int N = activeNotifications.size();
+		final String pkg = mc.getPackageName();
+		for (int i = 0; i < N; i++) {
+			final Entry entry = activeNotifications.get(i);
+			if (entry.notification.getPackageName().equals(pkg)) {
+				// NotificationInflater calls async MediaNotificationProcessoron
+				// to create notification
+				// colors and when finished will trigger AsyncInflationFinished
+				// for all registered callbacks
+				// like StatusBar. From there we'll send updated colors to Pulse
+				mEntryToRefresh = entry;
+				break;
+			}
+		}
+	}
 
     private final OnChildLocationsChangedListener mOnChildLocationsChangedListener =
             new OnChildLocationsChangedListener() {
@@ -1807,6 +1828,15 @@ public class StatusBar extends SystemUI implements DemoMode,
             updateNotificationShade();
         }
         entry.row.setLowPriorityStateUpdated(false);
+
+        if (mEntryToRefresh == entry) {
+            if (mNavigationBar != null) {
+                Notification n = entry.notification.getNotification();
+                int[] colors = {n.backgroundColor, n.foregroundColor,
+                        n.primaryTextColor, n.secondaryTextColor};
+                mNavigationBar.setPulseColors(n.isColorizedMedia(), colors);
+            }
+        }
     }
 
     private boolean shouldSuppressFullScreenIntent(String key) {
