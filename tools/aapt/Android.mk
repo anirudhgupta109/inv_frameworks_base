@@ -93,6 +93,19 @@ LOCAL_STATIC_LIBRARIES_windows := $(aaptHostStaticLibs_windows)
 include $(BUILD_HOST_STATIC_LIBRARY)
 
 # ==========================================================
+# Build the static library: libaapt
+# ==========================================================
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := libaapt
+LOCAL_CFLAGS := -Wno-format-y2k -DSTATIC_ANDROIDFW_FOR_TOOLS $(aaptCFlags)
+LOCAL_CPPFLAGS := $(aaptCppFlags)
+LOCAL_SRC_FILES := $(aaptSources)
+LOCAL_STATIC_LIBRARIES := $(aaptHostStaticLibs) libz
+
+include $(BUILD_SHARED_LIBRARY)
+
+# ==========================================================
 # Build the host executable: aapt
 # ==========================================================
 include $(CLEAR_VARS)
