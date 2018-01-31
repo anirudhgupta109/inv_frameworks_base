@@ -68,8 +68,6 @@ import android.service.dreams.DreamService;
 import android.service.dreams.IDreamManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.ServiceState;
-import android.telephony.SubscriptionInfo;
-import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.ArraySet;
@@ -94,7 +92,6 @@ import android.widget.TextView;
 import com.android.internal.colorextraction.drawable.GradientDrawable;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 
 /**
@@ -160,9 +157,6 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
     private final boolean mShowSilentToggle;
     private final EmergencyAffordanceManager mEmergencyAffordanceManager;
 
-    private BitSet mAirplaneModeBits;
-    private final List<PhoneStateListener> mPhoneStateListeners = new ArrayList<>();
-
     /**
      * @param context everything needs a context :(
      */
@@ -185,15 +179,9 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
         mHasTelephony = cm.isNetworkSupported(ConnectivityManager.TYPE_MOBILE);
 
         // get notified of phone state changes
-        SubscriptionManager.from(mContext).addOnSubscriptionsChangedListener(
-                new SubscriptionManager.OnSubscriptionsChangedListener() {
-            @Override
-            public void onSubscriptionsChanged() {
-                super.onSubscriptionsChanged();
-                setupAirplaneModeListeners();
-            }
-        });
-        setupAirplaneModeListeners();
+        TelephonyManager telephonyManager =
+                (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        telephonyManager.listen(mPhoneStateListener, PhoneStateListener.LISTEN_SERVICE_STATE);
         mContext.getContentResolver().registerContentObserver(
                 Settings.Global.getUriFor(Settings.Global.AIRPLANE_MODE_ON), true,
                 mAirplaneModeObserver);
@@ -204,56 +192,6 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
                 R.bool.config_useFixedVolume);
 
         mEmergencyAffordanceManager = new EmergencyAffordanceManager(context);
-    }
-
-    /**
-     * Since there are two ways of handling airplane mode (with telephony, we depend on the internal
-     * device telephony state), and MSIM devices do not report phone state for missing SIMs, we
-     * need to dynamically setup listeners based on subscription changes.
-     *
-     * So if there is _any_ active SIM in the device, we can depend on the phone state,
-     * otherwise fall back to {@link Settings.Global#AIRPLANE_MODE_ON}.
-     */
-    private void setupAirplaneModeListeners() {
-        TelephonyManager telephonyManager =
-                (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
-
-        for (PhoneStateListener listener : mPhoneStateListeners) {
-            telephonyManager.listen(listener, PhoneStateListener.LISTEN_NONE);
-        }
-        mPhoneStateListeners.clear();
-
-        final List<SubscriptionInfo> subInfoList = SubscriptionManager.from(mContext)
-                .getActiveSubscriptionInfoList();
-        if (subInfoList != null) {
-            mHasTelephony = true;
-            mAirplaneModeBits = new BitSet(subInfoList.size());
-            for (int i = 0; i < subInfoList.size(); i++) {
-                final int finalI = i;
-                PhoneStateListener subListener = new PhoneStateListener(subInfoList.get(finalI)
-                        .getSubscriptionId()) {
-                    @Override
-                    public void onServiceStateChanged(ServiceState serviceState) {
-                        final boolean inAirplaneMode = serviceState.getState()
-                                == ServiceState.STATE_POWER_OFF;
-                        mAirplaneModeBits.set(finalI, inAirplaneMode);
-
-                        // we're in airplane mode if _any_ of the subscriptions say we are
-                        mAirplaneState = mAirplaneModeBits.cardinality() > 0
-                                ? ToggleAction.State.On : ToggleAction.State.Off;
-
-                        mAirplaneModeOn.updateState(mAirplaneState);
-                        if (mAdapter != null) {
-                            mAdapter.notifyDataSetChanged();
-                        }
-                    }
-                };
-                mPhoneStateListeners.add(subListener);
-                telephonyManager.listen(subListener, PhoneStateListener.LISTEN_SERVICE_STATE);
-            }
-        } else {
-            mHasTelephony = false;
-        }
 
         // Set the initial status of airplane mode toggle
         mAirplaneState = getUpdatedAirplaneToggleState();
@@ -323,9 +261,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
         mAirplaneModeOn = new ToggleAction(
                 R.drawable.ic_lock_airplane_mode,
                 R.drawable.ic_lock_airplane_mode_off,
-                R.string.global_actions_toggle_airplane_mode,
-                R.string.global_actions_airplane_mode_on_status,
-                R.string.global_actions_airplane_mode_off_status) {
+                R.string.global_actions_toggle_airplane_mode) {
 
             void onToggle(boolean on) {
                 if (mHasTelephony && Boolean.parseBoolean(
@@ -354,7 +290,13 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
             }
 
             public boolean showDuringKeyguard() {
-                return true;
+                boolean showlocked = Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.POWERMENU_LS_AIRPLANE, 0) == 1;
+                return showlocked;
+            }
+
+            public boolean onLongPress() {
+                return false;
             }
 
             public boolean showBeforeProvisioning() {
@@ -370,7 +312,9 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
                 mWindowManagerFuncs, mHandler) {
 
             public boolean showDuringKeyguard() {
-                return true;
+                boolean showlocked = Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.POWERMENU_LS_ADVANCED_REBOOT, 0) == 1;
+                return showlocked;
             }
 
             public boolean showBeforeProvisioning() {
@@ -453,43 +397,46 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
                 mItems.add(new PowerAction());
             } else if (GLOBAL_ACTION_KEY_AIRPLANE.equals(actionKey)) {
                 if (Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.POWERMENU_AIRPLANE, 0) == 1) {
+                        Settings.System.POWERMENU_AIRPLANE, 0) != 0 && !isInLockTaskMode()) {
                     mItems.add(mAirplaneModeOn);
                 }
             } else if (GLOBAL_ACTION_KEY_BUGREPORT.equals(actionKey)) {
-                if (Settings.Global.getInt(mContext.getContentResolver(),
-                        Settings.Global.BUGREPORT_IN_POWER_MENU, 0) != 0 && isCurrentUserOwner()) {
-                    mItems.add(new BugReportAction());
-                }
+                //if (Settings.Global.getInt(mContext.getContentResolver(),
+                //        Settings.Global.BUGREPORT_IN_POWER_MENU, 0) != 0 && isCurrentUserOwner()) {
+                //    mItems.add(new BugReportAction());
+                //}
             } else if (GLOBAL_ACTION_KEY_SILENT.equals(actionKey)) {
-                if (Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.POWERMENU_SOUNDPANEL, 0) == 1) {
-                    mItems.add(mSilentModeAction);
-                }
+                //if (mShowSilentToggle) {
+                //    mItems.add(mSilentModeAction);
+                //}
             } else if (GLOBAL_ACTION_KEY_USERS.equals(actionKey)) {
-                if (SystemProperties.getBoolean("fw.power_user_switcher", false)) {
-                    addUsersToMenu(mItems);
-                }
+                //if (SystemProperties.getBoolean("fw.power_user_switcher", false)) {
+                //    addUsersToMenu(mItems);
+                //}
             } else if (GLOBAL_ACTION_KEY_SETTINGS.equals(actionKey)) {
-                if (Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.POWERMENU_SETTINGS, 0) != 0) {
-                    mItems.add(getSettingsAction());
-                }
+                //mItems.add(getSettingsAction());
             } else if (GLOBAL_ACTION_KEY_LOCKDOWN.equals(actionKey)) {
-                if (Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.POWERMENU_LOCKDOWN, 0) != 0) {
-                    mItems.add(getLockdownAction());
-                }
+                //mItems.add(getLockdownAction());
             } else if (GLOBAL_ACTION_KEY_VOICEASSIST.equals(actionKey)) {
-                mItems.add(getVoiceAssistAction());
+                //mItems.add(getVoiceAssistAction());
             } else if (GLOBAL_ACTION_KEY_ASSIST.equals(actionKey)) {
-                mItems.add(getAssistAction());
+                //mItems.add(getAssistAction());
             } else if (GLOBAL_ACTION_KEY_RESTART.equals(actionKey)) {
-                mItems.add(new RestartAction());
+                if (Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.POWERMENU_REBOOT, 1) == 1) {
+                    mItems.add(new RestartAction());
+                }
             } else if (GLOBAL_ACTION_KEY_ADVANCED.equals(actionKey)) {
-                mItems.add(mShowAdvancedToggles);
+                if (Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.POWERMENU_REBOOT, 1) == 1 && Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.POWERMENU_ADVANCED_REBOOT, 0) != 0 && !isInLockTaskMode()) {
+                    mItems.add(mShowAdvancedToggles);
+                }
             } else if (GLOBAL_ACTION_KEY_SCREENSHOT.equals(actionKey)) {
-                mItems.add(getScreenshotAction());
+                if (Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.POWERMENU_SCREENSHOT, 0) != 0 && !isInLockTaskMode()) {
+                    mItems.add(new ScreenshotAction());
+                }
             } else {
                 Log.e(TAG, "Invalid global action key " + actionKey);
             }
@@ -509,7 +456,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
                     long id) {
                 final Action action = mAdapter.getItem(position);
                 if (action instanceof LongPressAction) {
-                    mDialog.dismiss();
+                    //mDialog.dismiss();
                     return ((LongPressAction) action).onLongPress();
                 }
                 return false;
@@ -559,13 +506,14 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
 
     private final class RestartAction extends SinglePressAction implements LongPressAction {
         private RestartAction() {
-            super(R.drawable.ic_restart, R.string.global_action_restart);
+            super(R.drawable.ic_restart, com.android.systemui.R.string.global_action_restart_system);
         }
 
         @Override
         public boolean onLongPress() {
             UserManager um = (UserManager) mContext.getSystemService(Context.USER_SERVICE);
             if (!um.hasUserRestriction(UserManager.DISALLOW_SAFE_BOOT)) {
+                mDialog.dismiss();
                 mWindowManagerFuncs.reboot(true);
                 return true;
             }
@@ -574,7 +522,9 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
 
         @Override
         public boolean showDuringKeyguard() {
-            return true;
+            boolean showlocked = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.POWERMENU_LS_REBOOT, 1) == 1;
+            return showlocked;
         }
 
         @Override
@@ -588,31 +538,37 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
         }
     }
 
-    private Action getScreenshotAction() {
-        return new SinglePressAction(com.android.systemui.R.drawable.ic_screenshot,
-                com.android.systemui.R.string.global_action_screenshot) {
+    private final class ScreenshotAction extends SinglePressAction implements LongPressAction {
+        private ScreenshotAction() {
+            super(com.android.systemui.R.drawable.ic_screenshot, com.android.systemui.R.string.global_action_screenshot);
+        }
+        @Override
+        public void onPress() {
+           mHandler.postDelayed(new Runnable() {
+               @Override
+                public void run() {
+                    Intent intent = new Intent(Intent.ACTION_SCREENSHOT);
+                    mContext.sendBroadcast(intent);
+                }
+            }, 500);
+        }
 
-            @Override
-            public void onPress() {
-               mHandler.postDelayed(new Runnable() {
-                   @Override
-                    public void run() {
-                        Intent intent = new Intent(Intent.ACTION_SCREENSHOT);
-                        mContext.sendBroadcast(intent);
-                    }
-                }, 500);
-            }
+        @Override
+        public boolean onLongPress() {
+            return false;
+        }
 
-            @Override
-            public boolean showDuringKeyguard() {
-                return true;
-            }
+        @Override
+        public boolean showDuringKeyguard() {
+            boolean showlocked = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.POWERMENU_LS_SCREENSHOT, 0) == 1;
+            return showlocked;
+        }
 
-            @Override
-            public boolean showBeforeProvisioning() {
-                return true;
-            }
-        };
+        @Override
+        public boolean showBeforeProvisioning() {
+            return true;
+        }
     }
 
     private class BugReportAction extends SinglePressAction implements LongPressAction {
@@ -1103,32 +1059,27 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
             }
         }
 
+        public String getStatus() {
+            return null;
+        }
+
         protected State mState = State.Off;
 
         // prefs
         protected int mEnabledIconResId;
         protected int mDisabledIconResid;
         protected int mMessageResId;
-        protected int mEnabledStatusMessageResId;
-        protected int mDisabledStatusMessageResId;
 
         /**
          * @param enabledIconResId           The icon for when this action is on.
          * @param disabledIconResid          The icon for when this action is off.
          * @param message                    The general information message, e.g 'Silent Mode'
-         * @param enabledStatusMessageResId  The on status message, e.g 'sound disabled'
-         * @param disabledStatusMessageResId The off status message, e.g. 'sound enabled'
          */
-        public ToggleAction(int enabledIconResId,
-                int disabledIconResid,
-                int message,
-                int enabledStatusMessageResId,
-                int disabledStatusMessageResId) {
+
+        public ToggleAction(int enabledIconResId, int disabledIconResid, int message) {
             mEnabledIconResId = enabledIconResId;
             mDisabledIconResid = disabledIconResid;
             mMessageResId = message;
-            mEnabledStatusMessageResId = enabledStatusMessageResId;
-            mDisabledStatusMessageResId = disabledStatusMessageResId;
         }
 
         /**
@@ -1168,12 +1119,13 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
                 icon.setEnabled(enabled);
             }
 
-            if (statusView != null) {
-                statusView.setText(on ? mEnabledStatusMessageResId : mDisabledStatusMessageResId);
-                statusView.setVisibility(View.VISIBLE);
-                statusView.setEnabled(enabled);
-            }
+            final String status = getStatus();
+            if (!TextUtils.isEmpty(status)) {
+                statusView.setText(status);
+            } else {
+                statusView.setVisibility(View.GONE);
             v.setEnabled(enabled);
+            }
 
             return v;
         }
@@ -1279,7 +1231,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
 
         @Override
         public boolean onLongPress() {
-            return true;
+            return false;
         }
 
         public boolean isEnabled() {
@@ -1322,9 +1274,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
         public SilentModeToggleAction() {
             super(R.drawable.ic_audio_vol_mute,
                     R.drawable.ic_audio_vol,
-                    R.string.global_action_toggle_silent_mode,
-                    R.string.global_action_silent_mode_on_status,
-                    R.string.global_action_silent_mode_off_status);
+                    R.string.global_action_toggle_silent_mode);
         }
 
         void onToggle(boolean on) {
@@ -1436,6 +1386,17 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
         }
     };
 
+    PhoneStateListener mPhoneStateListener = new PhoneStateListener() {
+        @Override
+        public void onServiceStateChanged(ServiceState serviceState) {
+            if (!mHasTelephony) return;
+            final boolean inAirplaneMode = serviceState.getState() == ServiceState.STATE_POWER_OFF;
+            mAirplaneState = inAirplaneMode ? ToggleAction.State.On : ToggleAction.State.Off;
+            mAirplaneModeOn.updateState(mAirplaneState);
+            mAdapter.notifyDataSetChanged();
+        }
+    };
+
     private BroadcastReceiver mRingerModeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -1483,18 +1444,18 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
         }
     };
 
-    private ToggleAction.State getUpdatedAirplaneToggleState() {
-        return (Settings.Global.getInt(mContext.getContentResolver(),
-                    Settings.Global.AIRPLANE_MODE_ON, 0) == 1) ?
-                ToggleAction.State.On : ToggleAction.State.Off;
-    }
-
     private void addNewItems() {
         mItems.clear();
         mItems.add(mRestartHot);
         mItems.add(mRestartRecovery);
         mItems.add(mRestartBootloader);
         mItems.add(mRestartSystemUI);
+    }
+
+    private ToggleAction.State getUpdatedAirplaneToggleState() {
+        return (Settings.Global.getInt(mContext.getContentResolver(),
+                    Settings.Global.AIRPLANE_MODE_ON, 0) == 1) ?
+                ToggleAction.State.On : ToggleAction.State.Off;
     }
 
     private void onAirplaneModeChanged() {
@@ -1692,6 +1653,14 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
             }
         } catch (RemoteException e) {
             Log.e(TAG, "failure trying to perform hot reboot", e);
+        }
+    }
+
+    private boolean isInLockTaskMode() {
+        try {
+            return ActivityManagerNative.getDefault().isInLockTaskMode();
+        } catch (RemoteException e) {
+            return false;
         }
     }
 }
