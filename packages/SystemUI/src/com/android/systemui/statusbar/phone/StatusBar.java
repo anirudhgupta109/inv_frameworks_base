@@ -974,6 +974,8 @@ public class StatusBar extends SystemUI implements DemoMode,
         createAndAddWindows();
 
         mSettingsObserver.onChange(false); // set up
+        mAbcSettingsObserver.observe();
+        mAbcSettingsObserver.update();
         mCommandQueue.disable(switches[0], switches[6], false /* animate */);
         setSystemUiVisibility(switches[1], switches[7], switches[8], 0xffffffff,
                 fullscreenStackBounds, dockedStackBounds);
@@ -6036,6 +6038,12 @@ public class StatusBar extends SystemUI implements DemoMode,
             resolver.registerContentObserver(Settings.Secure.getUriFor(
                     Settings.Secure.FP_SWIPE_TO_DISMISS_NOTIFICATIONS),
                     false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SHOW_BATTERY_PERCENT),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.Secure.getUriFor(
+                    Settings.Secure.STATUS_BAR_BATTERY_STYLE),
+                    false, this, UserHandle.USER_ALL);
         }
 
         @Override
@@ -6052,6 +6060,11 @@ public class StatusBar extends SystemUI implements DemoMode,
             } else if (uri.equals(Settings.Secure.getUriFor(
                     Settings.Secure.FP_SWIPE_TO_DISMISS_NOTIFICATIONS))) {
                 setFpToDismissNotifications();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.SHOW_BATTERY_PERCENT))
+                    || uri.equals(Settings.Secure.getUriFor(
+                    Settings.Secure.STATUS_BAR_BATTERY_STYLE))) {
+                setStatusBarOptions();
             }
         }
 
@@ -6060,6 +6073,19 @@ public class StatusBar extends SystemUI implements DemoMode,
             setUseLessBoringHeadsUp();
             setQsPanelOptions();
             setFpToDismissNotifications();
+            setStatusBarOptions();
+        }
+    }
+
+    private void setStatusBarOptions() {
+        if (mStatusBarView != null) {
+            mStatusBarView.updateSettings();
+        }
+        if (mKeyguardStatusBar != null) {
+            mKeyguardStatusBar.updateSettings();
+        }
+        if (mQuickStatusBarHeader != null) {
+            mQuickStatusBarHeader.updateSettings();
         }
     }
 

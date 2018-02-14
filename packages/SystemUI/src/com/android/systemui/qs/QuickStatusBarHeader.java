@@ -52,6 +52,8 @@ public class QuickStatusBarHeader extends RelativeLayout {
     private Clock mClock;
     private Clock mLeftClock;
 
+    private BatteryMeterView mBatteryView;
+
     public QuickStatusBarHeader(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
@@ -76,8 +78,8 @@ public class QuickStatusBarHeader extends RelativeLayout {
         applyDarkness(R.id.battery, tintArea, intensity, colorForeground);
         applyDarkness(R.id.clock, tintArea, intensity, colorForeground);
 
-        BatteryMeterView battery = findViewById(R.id.battery);
-        battery.setForceShowPercent(true);
+        mBatteryView = findViewById(R.id.battery);
+        mBatteryView.setForceShowPercent(true);
 
         mClock = findViewById(R.id.clock);
         ((Clock)mClock).setIsQshb(true);
@@ -87,14 +89,20 @@ public class QuickStatusBarHeader extends RelativeLayout {
         mActivityStarter = Dependency.get(ActivityStarter.class);
     }
 
-    public void updateQsbhClock() {
-        if (mClock != null) {
-            ((Clock)mClock).updateSettings();
-        }
-        if (mLeftClock != null) {
-            ((Clock)mLeftClock).updateSettings();
-        }
-    }
+	public void updateQsbhClock() {
+		if (mClock != null) {
+			((Clock) mClock).updateSettings();
+		}
+		if (mLeftClock != null) {
+			((Clock) mLeftClock).updateSettings();
+		}
+	}
+
+	public void updateSettings() {
+		if (mBatteryView != null) {
+			mBatteryView.updateSettings(true);
+		}
+	}
 
     private void applyDarkness(int id, Rect tintArea, float intensity, int color) {
         View v = findViewById(id);
