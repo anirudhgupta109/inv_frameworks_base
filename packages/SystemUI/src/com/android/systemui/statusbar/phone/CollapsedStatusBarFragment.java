@@ -39,6 +39,7 @@ import com.android.systemui.Dependency;
 import com.android.systemui.Interpolators;
 import com.android.systemui.R;
 import com.android.systemui.SysUiServiceProvider;
+import com.android.systemui.BatteryMeterView;
 import com.android.systemui.statusbar.CommandQueue;
 import com.android.systemui.statusbar.SignalClusterView;
 import com.android.systemui.statusbar.phone.StatusBarIconController.DarkIconManager;
@@ -70,6 +71,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
 
     private View mClock;
     private View mLeftClock;
+    private BatteryMeterView mBattery;
 
     private CustomSettingsObserver mObserver;
     private ContentResolver mContentResolver;
@@ -135,6 +137,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
             ((Clock)mClock).updateSettings();
             ((Clock)mLeftClock).updateSettings();
             mStatusBarComponent.updateQsbhClock();
+            mBattery.updateSettings(true);
         }
     }
 
@@ -157,6 +160,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         mSignalClusterView = mStatusBar.findViewById(R.id.signal_cluster);
         mClock = mStatusBar.findViewById(R.id.clock);
         mLeftClock = mStatusBar.findViewById(R.id.left_clock);
+        mBattery = mStatusBar.findViewById(R.id.battery);
         Dependency.get(DarkIconDispatcher.class).addDarkReceiver(mSignalClusterView);
         // Default to showing until we know otherwise.
         showSystemIconArea(false);
