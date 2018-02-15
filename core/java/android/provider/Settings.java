@@ -4235,6 +4235,13 @@ public final class Settings {
                 "volume_keys_control_media_stream";
 
         /**
+         * Select various accents to go along with system themes
+         *
+         * @hide
+         */
+        public static final String ACCENT_PICKER = "accent_picker";
+
+        /**
          * Change volume up and down handlign based on rotation
          * @hide
          */
