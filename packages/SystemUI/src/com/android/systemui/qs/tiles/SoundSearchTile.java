@@ -29,17 +29,17 @@ import com.android.systemui.plugins.qs.QSTile.BooleanState;
 import com.android.systemui.qs.tileimpl.QSTileImpl;
 import com.android.systemui.R;
 
-public class SoundSearchTIle extends QSTileImpl<BooleanState> {
+public class SoundSearchTile extends QSTileImpl<BooleanState> {
 
     private final String soundSearchApp = "com.google.android.googlequicksearchbox";
 
-    public SoundSearchTIle(QSHost host) {
+    public SoundSearchTile(QSHost host) {
         super(host);
     }
 
     @Override
     public int getMetricsCategory() {
-        return MetricsEvent.ABC;
+        return MetricsEvent.CUSTOM_QS;
     }
 
     @Override
