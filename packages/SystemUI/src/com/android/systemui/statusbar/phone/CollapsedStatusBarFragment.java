@@ -71,7 +71,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
     private View mClock;
     private View mLeftClock;
 
-    private CustomSettingsObserver mTickerObserver;
+    private CustomSettingsObserver mObserver;
     private ContentResolver mContentResolver;
 
     private SignalCallback mSignalCallback = new SignalCallback() {
@@ -87,7 +87,8 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         mKeyguardMonitor = Dependency.get(KeyguardMonitor.class);
         mNetworkController = Dependency.get(NetworkController.class);
         mStatusBarComponent = SysUiServiceProvider.getComponent(getContext(), StatusBar.class);
-        mTickerObserver = new CustomSettingsObserver(new Handler());
+        mContentResolver = getContext().getContentResolver();
+        mObserver = new CustomSettingsObserver(new Handler());
     }
 
     class CustomSettingsObserver extends UserContentObserver {
@@ -98,7 +99,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
 
         protected void unobserve() {
             super.unobserve();
-            getContext().getContentResolver().unregisterContentObserver(this);
+            mContentResolver.unregisterContentObserver(this);
         }
 
         protected void observe() {
@@ -133,6 +134,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         protected void update() {
             ((Clock)mClock).updateSettings();
             ((Clock)mLeftClock).updateSettings();
+            mStatusBarComponent.updateQsbhClock();
         }
     }
 
@@ -159,6 +161,9 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         // Default to showing until we know otherwise.
         showSystemIconArea(false);
         initEmergencyCryptkeeperText();
+
+        mObserver.observe();
+        mObserver.update();
     }
 
     @Override
@@ -187,6 +192,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         if (mNetworkController.hasEmergencyCryptKeeperText()) {
             mNetworkController.removeCallback(mSignalCallback);
         }
+        mObserver.unobserve();
     }
 
     public void initNotificationIconArea(NotificationIconAreaController

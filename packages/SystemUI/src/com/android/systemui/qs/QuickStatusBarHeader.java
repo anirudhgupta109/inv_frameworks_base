@@ -33,6 +33,7 @@ import com.android.systemui.R.id;
 import com.android.systemui.plugins.ActivityStarter;
 import com.android.systemui.qs.QSDetail.Callback;
 import com.android.systemui.statusbar.SignalClusterView;
+import com.android.systemui.statusbar.policy.Clock;
 import com.android.systemui.statusbar.policy.DarkIconDispatcher.DarkReceiver;
 
 
@@ -47,6 +48,9 @@ public class QuickStatusBarHeader extends RelativeLayout {
 
     protected QuickQSPanel mHeaderQsPanel;
     protected QSTileHost mHost;
+
+    private Clock mClock;
+    private Clock mLeftClock;
 
     public QuickStatusBarHeader(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -75,7 +79,21 @@ public class QuickStatusBarHeader extends RelativeLayout {
         BatteryMeterView battery = findViewById(R.id.battery);
         battery.setForceShowPercent(true);
 
+        mClock = findViewById(R.id.clock);
+        ((Clock)mClock).setIsQshb(true);
+        mLeftClock = findViewById(R.id.left_clock);
+        ((Clock)mLeftClock).setIsQshb(true);
+
         mActivityStarter = Dependency.get(ActivityStarter.class);
+    }
+
+    public void updateQsbhClock() {
+        if (mClock != null) {
+            ((Clock)mClock).updateSettings();
+        }
+        if (mLeftClock != null) {
+            ((Clock)mLeftClock).updateSettings();
+        }
     }
 
     private void applyDarkness(int id, Rect tintArea, float intensity, int color) {
