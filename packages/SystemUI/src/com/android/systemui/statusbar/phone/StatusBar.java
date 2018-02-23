@@ -656,6 +656,33 @@ public class StatusBar extends SystemUI implements DemoMode,
         @Override
         public void onSessionDestroyed() {
             super.onSessionDestroyed();
+
+            setMediaPlaying();
+        }
+    };
+
+    public void setMediaPlaying() {
+        if (PlaybackState.STATE_PLAYING ==
+                getMediaControllerPlaybackState(mMediaController)
+                || PlaybackState.STATE_BUFFERING ==
+                getMediaControllerPlaybackState(mMediaController)) {
+            tickTrackInfo(mMediaController);
+            mNoMan.setMediaPlaying(true);
+            final String currentPkg = mMediaController.getPackageName().toLowerCase();
+            for (String packageName : mNavMediaArrowsExcludeList) {
+                if (currentPkg.contains(packageName)) {
+                    return;
+                }
+            }
+            if (mNavigationBar != null) {
+                // pulse colors already set by titckTrackInfo
+                mNavigationBar.setMediaPlaying(true);
+            }
+        } else {
+            if (isAmbientContainerAvailable()) {
+                ((AmbientIndicationContainer)mAmbientIndicationContainer).hideIndication();
+            }
+            mNoMan.setMediaPlaying(false);
             if (mNavigationBar != null) {
                 setMediaPlaying();
             }
@@ -2525,6 +2552,8 @@ public class StatusBar extends SystemUI implements DemoMode,
                     setMediaPlaying();
                 }
                 mMediaMetadata = mMediaController.getMetadata();
+                setMediaPlaying();
+
                 if (DEBUG_MEDIA) {
                     Log.v(TAG, "DEBUG_MEDIA: insert listener, receive metadata: "
                             + mMediaMetadata);
