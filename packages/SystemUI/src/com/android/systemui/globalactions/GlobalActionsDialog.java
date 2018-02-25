@@ -685,7 +685,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
 
     private final class ScreenRecordAction extends SinglePressAction implements LongPressAction {
         private ScreenRecordAction() {
-            super(com.android.systemui.R.drawable.ic_sysbar_record_screen_dark, com.android.systemui.R.string.global_action_screen_record);
+            super(com.android.systemui.R.drawable.ic_power_menu_record_screen, com.android.systemui.R.string.global_action_screen_record);
         }
 
         @Override
@@ -718,7 +718,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
 
     private final class ScreenOffAction extends SinglePressAction implements LongPressAction {
         private ScreenOffAction() {
-            super(com.android.systemui.R.drawable.ic_sysbar_screen_off_dark, com.android.systemui.R.string.global_action_screen_off);
+            super(com.android.systemui.R.drawable.ic_power_menu_screen_off, com.android.systemui.R.string.global_action_screen_off);
         }
 
         @Override
@@ -777,7 +777,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
 
     private final class KillTaskAction extends SinglePressAction implements LongPressAction {
         private KillTaskAction() {
-            super(com.android.systemui.R.drawable.ic_sysbar_killtask_dark, com.android.systemui.R.string.global_action_kill_task);
+            super(com.android.systemui.R.drawable.ic_power_menu_killtask, com.android.systemui.R.string.global_action_kill_task);
         }
 
         @Override
@@ -803,7 +803,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
 
     private final class GoogleAssistantAction extends SinglePressAction implements LongPressAction {
         private GoogleAssistantAction() {
-            super(com.android.systemui.R.drawable.ic_sysbar_google_now_on_tap_dark, com.android.systemui.R.string.global_action_google_assistant);
+            super(com.android.systemui.R.drawable.ic_power_menu_google_now_on_tap, com.android.systemui.R.string.global_action_google_assistant);
         }
 
         @Override
@@ -896,7 +896,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
     }
 
     private Action getSettingsAction() {
-        return new SinglePressAction(R.drawable.ic_settings,
+        return new SinglePressAction(com.android.systemui.R.drawable.ic_power_menu_settings,
                 R.string.global_action_settings) {
 
             @Override

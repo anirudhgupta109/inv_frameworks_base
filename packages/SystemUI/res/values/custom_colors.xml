@@ -26,4 +26,16 @@
      <!-- Floating action button -->
      <color name="fab_color">@*android:color/accent_device_default_light</color>
      <color name="floating_action_button_icon_color">@android:color/white</color>
+
+    <!-- Additional power menu -->
+    <color name="power_menu_airplane_on">#ff202020</color>
+    <color name="power_menu_airplane_off">#ff202020</color>
+    <color name="power_menu_sound_panel">#ff202020</color>
+    <color name="power_menu_record_screen">#ff202020</color>
+    <color name="power_menu_kill_task">#ff202020</color>
+    <color name="power_menu_google_assist">#ff202020</color>
+    <color name="power_menu_screen_off">#ff202020</color>
+    <color name="power_menu_actions">#ff202020</color>
+    <color name="power_menu_actions_back">#ff202020</color>
+    <color name="power_menu_settings">#ff202020</color>
 </resources>
