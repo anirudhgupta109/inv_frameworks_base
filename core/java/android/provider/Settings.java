@@ -10177,6 +10177,8 @@ public final class Settings {
         /** @hide */ public static final int HEADS_UP_OFF = 0;
         /** @hide */ public static final int HEADS_UP_ON = 1;
 
+	public static final String SETTING_HEADS_UP_TICKER = "ticker_gets_heads_up";
+
         /**
          * The name of the device
          */
