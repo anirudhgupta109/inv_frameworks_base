@@ -264,7 +264,6 @@
                   android:theme="@style/CustomTunerSettings"
                   android:label="@string/system_ui_tuner"
                   android:process=":tuner"
-                  android:parentActivityName="com.abc.settings.AbcSettings"
                   android:exported="true">
         </activity>
 
@@ -273,7 +272,7 @@
                   android:theme="@style/CustomTunerSettings"
                   android:label="@string/statusbar_icons_blacklist"
                   android:process=":tuner"
-                  android:parentActivityName="com.abc.settings.StatusBarSettings"
+                  android:parentActivityName="com.armory.settings.ui.StatusBarSettings"
                   android:exported="true">
         </activity>
 
@@ -281,7 +280,7 @@
                   android:theme="@style/CustomTunerSettings"
                   android:label="@string/navbar_tuner_activity"
                   android:process=":tuner"
-                  android:parentActivityName="com.abc.settings.NavbarSettings"
+                  android:parentActivityName="com.armory.settings.ui.NavigationBarSettings"
                   android:exported="true">
         </activity>
 
@@ -289,7 +288,7 @@
                   android:theme="@style/CustomTunerSettings"
                   android:label="@string/lockscreen_tuner_activity"
                   android:process=":tuner"
-                  android:parentActivityName="com.abc.settings.LockScreenSettings"
+                  android:parentActivityName="com.armory.settings.ui.LockScreenSettings"
                   android:exported="true">
         </activity>
 
@@ -297,7 +296,6 @@
                   android:theme="@style/CustomTunerSettings"
                   android:label="@string/powernotif_tuner_activity"
                   android:process=":tuner"
-                  android:parentActivityName="com.abc.settings.PowerNotificationsSettings"
                   android:exported="true">
         </activity>
 
