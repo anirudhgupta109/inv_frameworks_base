@@ -21,6 +21,6 @@
   <java-symbol type="dimen" name="config_screenAspectRatio" />
 
   <!-- Forcefully tint notification icon text -->
-  <java-symbol type="bool" name="config_useDarkBgNotificationIconTextTinting" />
-
+  <java-symbol type="bool" name="config_useDarkBgNotificationTinting_override" />
+  <java-symbol type="bool" name="config_notificationTinting_override" />
 </resources>
