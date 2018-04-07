@@ -4423,6 +4423,13 @@ public final class Settings {
          */
         public static final String SCREENRECORD_QUALITY_MODE = "screenrecord_quality_mode";
 
+       /**
+         * Whether to use a letterbox effect for fullscreen apps
+         *
+         * @hide
+         */
+        public static final String USE_LETTERBOX_WHEN_FULLSCREEN = "use_letterbox_when_fullscreen";
+
         /**
          * show clear all recents button
          * @hide
