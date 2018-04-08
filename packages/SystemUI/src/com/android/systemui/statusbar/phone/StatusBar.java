@@ -5082,6 +5082,8 @@ public class StatusBar extends SystemUI implements DemoMode,
 
         int userThemeSetting = Settings.System.getIntForUser(mContext.getContentResolver(),
                 Settings.System.SYSTEM_UI_THEME, 0, mCurrentUserId);
+        haltTicker();
+
         boolean useDarkTheme = false;
         if (userThemeSetting == 0) {
             // The system wallpaper defines if QS should be light or dark.
