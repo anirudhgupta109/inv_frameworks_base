@@ -42,6 +42,7 @@ static const char* kPathWhitelist[] = {
   "/dev/urandom",
   "/dev/ion",
   "/dev/dri/renderD129", // Fixes b/31172436
+  "/product/overlay/frameworkResOverlay.apk",
 };
 
 static const char kFdPath[] = "/proc/self/fd";
