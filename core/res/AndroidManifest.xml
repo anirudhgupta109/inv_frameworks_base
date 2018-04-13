@@ -558,6 +558,9 @@
     <!-- Volume steps -->
     <protected-broadcast android:name="android.media.VOLUME_STEPS_CHANGED_ACTION" />
 
+    <!-- Font service -->
+    <protected-broadcast android:name="com.android.server.ACTION_FONT_CHANGED" />
+
     <!-- ====================================================================== -->
     <!--                          RUNTIME PERMISSIONS                           -->
     <!-- ====================================================================== -->
