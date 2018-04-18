@@ -64,4 +64,9 @@
         android:summary="%s"
         android:title="@string/right_icon" />
 
+    <com.android.systemui.tuner.SystemSettingSwitchPreference
+	android:key="pixel_nav_animation"
+	android:title="@string/pixel_navbar_animation"
+	android:defaultValue="true" />
+
 </PreferenceScreen>
