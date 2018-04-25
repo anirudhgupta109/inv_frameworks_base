@@ -861,7 +861,14 @@ final class DefaultPermissionGrantPolicy {
             if (invUpdatePackage != null && doesPackageSupportRuntimePermissions(invUpdatePackage)) {
                 grantRuntimePermissionsLPw(invUpdatePackage, STORAGE_PERMISSIONS, true, userId);
             }
-            
+
+            // SystemUI: needed for Pulse support
+            PackageParser.Package invSystemUI = getSystemPackageLPr(
+                    "com.android.systemui");
+            if (invSystemUI != null && doesPackageSupportRuntimePermissions(invSystemUI)) {
+                grantRuntimePermissionsLPw(invSystemUI, MICROPHONE_PERMISSIONS, true, userId);
+            }
+
             // Project Fi
             PackageParser.Package fiPackage = getDefaultProviderAuthorityPackageLPr(
                     "com.google.android.apps.tycho", userId);
