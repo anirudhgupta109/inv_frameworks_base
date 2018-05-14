@@ -20,8 +20,10 @@ import android.content.Intent;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.service.quicksettings.Tile;
+import android.view.IWindowManager;
+import android.view.WindowManagerGlobal;
 
-import com.android.internal.util.abc.AbcUtils;
+import com.android.internal.utils.du.ActionHandler;
 import com.android.internal.logging.nano.MetricsProto.MetricsEvent;
 import com.android.systemui.qs.QSHost;
 import com.android.systemui.plugins.qs.QSTile.BooleanState;
@@ -41,7 +43,7 @@ public class ScreenshotTile extends QSTileImpl<BooleanState> {
 
     @Override
     public int getMetricsCategory() {
-        return MetricsEvent.ABC;
+        return MetricsEvent.CUSTOM_QS;
     }
 
     @Override
@@ -69,7 +71,16 @@ public class ScreenshotTile extends QSTileImpl<BooleanState> {
         try {
              Thread.sleep(1000); //1s
         } catch (InterruptedException ie) {}
-        AbcUtils.takeScreenshot(mRegion ? false : true);
+        try {
+           IWindowManager windowManager = WindowManagerGlobal.getWindowManagerService();
+           if(mRegion) {
+               windowManager.sendCustomAction(new Intent(ActionHandler.INTENT_REGION_SCREENSHOT));
+           } else {
+               windowManager.sendCustomAction(new Intent(ActionHandler.INTENT_SCREENSHOT));
+           }
+       } catch (Exception ex) {
+               ex.printStackTrace();
+        }
     }
 
     @Override
