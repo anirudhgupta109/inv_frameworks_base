@@ -690,7 +690,12 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
 
         @Override
         public void onPress() {
-            GzospUtils.takeScreenrecord(WindowManager.SCREEN_RECORD_ULTRA_QUALITY);
+           mHandler.postDelayed(new Runnable() {
+               @Override
+                public void run() {
+                    GzospUtils.takeScreenrecord(WindowManager.SCREEN_RECORD_ULTRA_QUALITY);
+                }
+            }, 500);
         }
 
         @Override
