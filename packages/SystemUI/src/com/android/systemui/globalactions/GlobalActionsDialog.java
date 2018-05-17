@@ -20,6 +20,7 @@ import com.android.internal.colorextraction.ColorExtractor.GradientColors;
 import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.nano.MetricsProto.MetricsEvent;
 import com.android.internal.util.EmergencyAffordanceManager;
+import com.android.internal.statusbar.IStatusBarService;
 import com.android.internal.telephony.TelephonyIntents;
 import com.android.internal.telephony.TelephonyProperties;
 import com.android.internal.widget.LockPatternUtils;
@@ -30,6 +31,7 @@ import com.android.systemui.colorextraction.SysuiColorExtractor;
 import com.android.systemui.plugins.GlobalActions.GlobalActionsManager;
 import com.android.systemui.statusbar.notification.NotificationUtils;
 import com.android.systemui.statusbar.phone.ScrimController;
+import com.android.internal.utils.du.ActionHandler;
 import com.android.systemui.volume.VolumeDialogMotion.LogAccelerateInterpolator;
 import com.android.systemui.volume.VolumeDialogMotion.LogDecelerateInterpolator;
 
@@ -53,12 +55,15 @@ import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
 import android.os.PowerManager;
 import android.os.Process;
 import android.os.RemoteException;
 import android.os.ServiceManager;
+import android.os.SystemClock;
 import android.os.SystemProperties;
 import android.os.UserHandle;
 import android.os.UserManager;
@@ -260,59 +265,6 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
      * @return A new dialog.
      */
     private ActionsDialog createDialog() {
-        // Simple toggle style if there's no vibrator, otherwise use a tri-state
-        if (!mHasVibrator) {
-            mSilentModeAction = new SilentModeToggleAction();
-        } else {
-            mSilentModeAction = new SilentModeTriStateAction(mContext, mAudioManager, mHandler);
-        }
-        mAirplaneModeOn = new ToggleAction(
-                R.drawable.ic_lock_airplane_mode,
-                R.drawable.ic_lock_airplane_mode_off,
-                R.string.global_actions_toggle_airplane_mode) {
-
-            void onToggle(boolean on) {
-                if (mHasTelephony && Boolean.parseBoolean(
-                        SystemProperties.get(TelephonyProperties.PROPERTY_INECM_MODE))) {
-                    mIsWaitingForEcmExit = true;
-                    // Launch ECM exit dialog
-                    Intent ecmDialogIntent =
-                            new Intent(TelephonyIntents.ACTION_SHOW_NOTICE_ECM_BLOCK_OTHERS, null);
-                    ecmDialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    mContext.startActivity(ecmDialogIntent);
-                } else {
-                    changeAirplaneModeSystemSetting(on);
-                }
-            }
-
-            @Override
-            protected void changeStateFromPress(boolean buttonOn) {
-                if (!mHasTelephony) return;
-
-                // In ECM mode airplane state cannot be changed
-                if (!(Boolean.parseBoolean(
-                        SystemProperties.get(TelephonyProperties.PROPERTY_INECM_MODE)))) {
-                    mState = buttonOn ? State.TurningOn : State.TurningOff;
-                    mAirplaneState = mState;
-                }
-            }
-
-            public boolean showDuringKeyguard() {
-                boolean showlocked = Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.POWERMENU_LS_AIRPLANE, 0) == 1;
-                return showlocked;
-            }
-
-            public boolean onLongPress() {
-                return false;
-            }
-
-            public boolean showBeforeProvisioning() {
-                return false;
-            }
-        };
-        onAirplaneModeChanged();
-
         mShowAdvancedToggles = new AdvancedAction(
                 SHOW_TOGGLES_BUTTON,
                 com.android.systemui.R.drawable.ic_restart_advanced,
@@ -420,6 +372,60 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
             }
         };
 
+        // Simple toggle style if there's no vibrator, otherwise use a tri-state
+        if (!mHasVibrator) {
+            mSilentModeAction = new SilentModeToggleAction();
+        } else {
+            mSilentModeAction = new SilentModeTriStateAction(mContext, mAudioManager, mHandler);
+        }
+
+        mAirplaneModeOn = new ToggleAction(
+                com.android.systemui.R.drawable.ic_airplane_mode_on,
+                com.android.systemui.R.drawable.ic_airplane_mode_off,
+                R.string.global_actions_toggle_airplane_mode) {
+
+            void onToggle(boolean on) {
+                if (mHasTelephony && Boolean.parseBoolean(
+                        SystemProperties.get(TelephonyProperties.PROPERTY_INECM_MODE))) {
+                    mIsWaitingForEcmExit = true;
+                    // Launch ECM exit dialog
+                    Intent ecmDialogIntent =
+                            new Intent(TelephonyIntents.ACTION_SHOW_NOTICE_ECM_BLOCK_OTHERS, null);
+                    ecmDialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    mContext.startActivity(ecmDialogIntent);
+                } else {
+                    changeAirplaneModeSystemSetting(on);
+                }
+            }
+
+            @Override
+            protected void changeStateFromPress(boolean buttonOn) {
+                if (!mHasTelephony) return;
+
+                // In ECM mode airplane state cannot be changed
+                if (!(Boolean.parseBoolean(
+                        SystemProperties.get(TelephonyProperties.PROPERTY_INECM_MODE)))) {
+                    mState = buttonOn ? State.TurningOn : State.TurningOff;
+                    mAirplaneState = mState;
+                }
+            }
+
+            public boolean showDuringKeyguard() {
+                boolean showlocked = Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.POWERMENU_LS_AIRPLANE, 0) == 1;
+                return showlocked;
+            }
+
+            public boolean onLongPress() {
+                return false;
+            }
+
+            public boolean showBeforeProvisioning() {
+                return false;
+            }
+        };
+        onAirplaneModeChanged();
+
 	populateItems();
 
         mAdapter = new MyAdapter();
@@ -516,6 +522,27 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
         if(Settings.System.getInt(mContext.getContentResolver(),
                 Settings.System.POWERMENU_SCREENSHOT, 0) != 0) {
             return true;
+        } else if(Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.POWERMENU_SCREEN_RECORD, 0) != 0) {
+            return true;
+        } else if(Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.POWERMENU_KILL_TASK, 0) != 0) {
+            return true;
+        } else if(Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.POWERMENU_LOCKDOWN, 0) != 0) {
+            return true;
+        } else if(Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.POWERMENU_SOUNDPANEL, 0) != 0) {
+            return true;
+        } else if(Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.POWERMENU_AIRPLANE, 0) != 0) {
+            return true;
+        } else if(Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.POWERMENU_SETTINGS, 0) != 0) {
+            return true;
+        } else if(Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.POWERMENU_GOOGLE_ASSISTANT, 0) != 0) {
+            return true;
         }
         return false;
     }
@@ -524,6 +551,34 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
         if (Settings.System.getInt(mContext.getContentResolver(),
                 Settings.System.POWERMENU_SCREENSHOT, 0) != 0 && !isInLockTaskMode()) {
             mItems.add(new ScreenshotAction());
+        }
+        if (Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.POWERMENU_SCREEN_RECORD, 0) != 0 && !isInLockTaskMode()) {
+            mItems.add(new ScreenRecordAction());
+        }
+        if (Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.POWERMENU_AIRPLANE, 0) != 0 && !isInLockTaskMode()) {
+            mItems.add(mAirplaneModeOn);
+        }
+        if (Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.POWERMENU_KILL_TASK, 0) != 0 && !isInLockTaskMode()) {
+            mItems.add(new KillTaskAction());
+        }
+        if (Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.POWERMENU_LOCKDOWN, 0) != 0 && !isInLockTaskMode()) {
+            mItems.add(new ScreenOffAction());
+        }
+        if (Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.POWERMENU_GOOGLE_ASSISTANT, 0) != 0 && !isInLockTaskMode()) {
+            mItems.add(new GoogleAssistantAction());
+        }
+        if (Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.POWERMENU_SETTINGS, 0) != 0 && !isInLockTaskMode()) {
+            mItems.add(getSettingsAction());
+        }
+        if (Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.POWERMENU_SOUNDPANEL, 0) != 0 && !isInLockTaskMode()) {
+            mItems.add(new SoundPanelAction());
         }
     }
 
@@ -627,8 +682,148 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
         }
     }
 
-    private class BugReportAction extends SinglePressAction implements LongPressAction {
+    private final class ScreenRecordAction extends SinglePressAction implements LongPressAction {
+        private ScreenRecordAction() {
+            super(com.android.systemui.R.drawable.ic_sysbar_record_screen_dark, com.android.systemui.R.string.global_action_screen_record);
+        }
 
+        @Override
+        public void onPress() {
+        }
+
+        @Override
+        public boolean onLongPress() {
+            return false;
+        }
+
+        @Override
+        public boolean showDuringKeyguard() {
+            boolean showlocked = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.POWERMENU_LS_SCREEN_RECORD, 0) == 1;
+            return showlocked;
+        }
+
+        @Override
+        public boolean showBeforeProvisioning() {
+            return true;
+        }
+    }
+
+    private final class ScreenOffAction extends SinglePressAction implements LongPressAction {
+        private ScreenOffAction() {
+            super(com.android.systemui.R.drawable.ic_sysbar_screen_off_dark, com.android.systemui.R.string.global_action_screen_off);
+        }
+
+        @Override
+        public void onPress() {
+            PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+            if(pm != null)
+                pm.goToSleep(SystemClock.uptimeMillis());
+        }
+
+        @Override
+        public boolean onLongPress() {
+            return false;
+        }
+
+        @Override
+        public boolean showDuringKeyguard() {
+            boolean showlocked = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.POWERMENU_LS_LOCKDOWN, 0) == 1;
+            return showlocked;
+        }
+
+        @Override
+        public boolean showBeforeProvisioning() {
+            return true;
+        }
+    }
+
+    private final class SoundPanelAction extends SinglePressAction implements LongPressAction {
+        private SoundPanelAction() {
+            super(com.android.systemui.R.drawable.ic_sound_panel, com.android.systemui.R.string.global_action_sound_panel);
+        }
+
+        @Override
+        public void onPress() {
+            AudioManager audio = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+            audio.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
+        }
+
+        @Override
+        public boolean onLongPress() {
+            return false;
+        }
+
+        @Override
+        public boolean showDuringKeyguard() {
+            boolean showlocked = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.POWERMENU_LS_SOUNDPANEL, 0) == 1;
+            return showlocked;
+        }
+
+        @Override
+        public boolean showBeforeProvisioning() {
+            return true;
+        }
+    }
+
+    private final class KillTaskAction extends SinglePressAction implements LongPressAction {
+        private KillTaskAction() {
+            super(com.android.systemui.R.drawable.ic_sysbar_killtask_dark, com.android.systemui.R.string.global_action_kill_task);
+        }
+
+        @Override
+        public void onPress() {
+            ActionHandler.killProcess(mContext);
+        }
+
+        @Override
+        public boolean onLongPress() {
+            return false;
+        }
+
+        @Override
+        public boolean showDuringKeyguard() {
+            return false;
+        }
+
+        @Override
+        public boolean showBeforeProvisioning() {
+            return false;
+        }
+    }
+
+    private final class GoogleAssistantAction extends SinglePressAction implements LongPressAction {
+        private GoogleAssistantAction() {
+            super(com.android.systemui.R.drawable.ic_sysbar_google_now_on_tap_dark, com.android.systemui.R.string.global_action_google_assistant);
+        }
+
+        @Override
+        public void onPress() {
+            try {
+                 IStatusBarService sbService = IStatusBarService.Stub.asInterface(ServiceManager.getService("statusbar"));
+                 sbService.startAssist(new Bundle());
+            } catch (Exception e) { }
+        }
+
+        @Override
+        public boolean onLongPress() {
+            return false;
+        }
+
+        @Override
+        public boolean showDuringKeyguard() {
+            return false;
+        }
+
+        @Override
+        public boolean showBeforeProvisioning() {
+            return false;
+        }
+    }
+
+    private class BugReportAction extends SinglePressAction implements LongPressAction {
         public BugReportAction() {
             super(R.drawable.ic_lock_bugreport, R.string.bugreport_title);
         }
@@ -1155,8 +1350,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
                 LayoutInflater inflater) {
             willCreate();
 
-            View v = inflater.inflate(R
-                    .layout.global_actions_item, parent, false);
+            View v = inflater.inflate(com.android.systemui.R.layout.global_actions_item, parent, false);
 
             ImageView icon = (ImageView) v.findViewById(R.id.icon);
             TextView messageView = (TextView) v.findViewById(R.id.message);
