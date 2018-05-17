@@ -22,7 +22,12 @@
     <string name="screenshot_abort_text">Operation aborted.</string>
 
     <!-- Power menu -->
+    <string name="global_action_sound_panel">Sound Panel</string>
     <string name="global_action_back">Back</string>
+    <string name="global_action_screen_record">Screen Record</string>
+    <string name="global_action_kill_task">Kill Task</string>
+    <string name="global_action_screen_off">Screen Off</string>
+    <string name="global_action_google_assistant">Google Assistant</string>
     <string name="global_action_actions">Actions</string>
     <string name="global_action_restart_system">Reboot</string>
     <string name="global_action_restart_advanced">Advanced</string>

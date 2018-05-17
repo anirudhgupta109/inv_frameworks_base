@@ -57,6 +57,5 @@
         <item>restart</item>
         <item>advanced</item>
         <item>actions</item>
-        <item>screenshot</item>
     </string-array>
 </resources>

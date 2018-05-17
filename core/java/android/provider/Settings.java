@@ -4014,6 +4014,24 @@ public final class Settings {
         public static final String POWERMENU_SETTINGS = "powermenu_settings";
 
         /**
+         * Whether to display screen record option in the power menu
+         * @hide
+         */
+        public static final String POWERMENU_SCREEN_RECORD = "powermenu_screen_record";
+
+        /**
+         * Whether to display kill task option in the power menu
+         * @hide
+         */
+        public static final String POWERMENU_KILL_TASK = "powermenu_kill_task";
+
+        /**
+         * Whether to display google assistant option in the power menu
+         * @hide
+         */
+        public static final String POWERMENU_GOOGLE_ASSISTANT = "powermenu_google_assistant";
+
+        /**
          * Whether to display lock option in the power menu
          *
          * @hide
@@ -4061,6 +4079,34 @@ public final class Settings {
          * @hide
          */
         public static final String POWERMENU_LS_REBOOT = "powermenu_ls_reboot";
+
+        /**
+         * Whether to display the power menu screen record option on a secured lockscreen
+         *
+         * @hide
+         */
+        public static final String POWERMENU_LS_SCREEN_RECORD = "powermenu_ls_screen_record";
+
+        /**
+         * Whether to display the power menu lockdown option on a secured lockscreen
+         *
+         * @hide
+         */
+        public static final String POWERMENU_LS_LOCKDOWN = "powermenu_ls_lockdown";
+
+        /**
+         * Whether to display the power menu lockdown option on a secured lockscreen
+         *
+         * @hide
+         */
+        public static final String POWERMENU_LS_SOUNDPANEL = "powermenu_ls_soundpanel";
+
+        /**
+         * Whether to display the power menu google assistant option on a secured lockscreen
+         *
+         * @hide
+         */
+        public static final String POWERMENU_LS_GOOGLE_ASSISTANT = "powermenu_ls_google_assistant";
 
         /**
          * Whether to display the advanced reboot option on the power menu
