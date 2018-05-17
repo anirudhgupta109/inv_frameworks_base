@@ -85,6 +85,9 @@ public class TakeScreenrecordService extends Service {
                 case WindowManager.SCREEN_RECORD_HIGH_QUALITY:
                     toggleScreenrecord(finisher, WindowManager.SCREEN_RECORD_HIGH_QUALITY);
                     break;
+                case WindowManager.SCREEN_RECORD_ULTRA_QUALITY:
+                    toggleScreenrecord(finisher, WindowManager.SCREEN_RECORD_ULTRA_QUALITY);
+                    break;
             }
         }
     };

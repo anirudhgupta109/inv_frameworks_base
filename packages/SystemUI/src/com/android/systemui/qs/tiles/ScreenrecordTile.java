@@ -35,6 +35,7 @@ public class ScreenrecordTile extends QSTileImpl<BooleanState> {
     private static final int SCREEN_RECORD_LOW_QUALITY = WindowManager.SCREEN_RECORD_LOW_QUALITY;
     private static final int SCREEN_RECORD_MID_QUALITY = WindowManager.SCREEN_RECORD_MID_QUALITY;
     private static final int SCREEN_RECORD_HIGH_QUALITY = WindowManager.SCREEN_RECORD_HIGH_QUALITY;
+    private static final int SCREEN_RECORD_ULTRA_QUALITY = WindowManager.SCREEN_RECORD_ULTRA_QUALITY;
 
     private int mMode;
 
@@ -71,6 +72,8 @@ public class ScreenrecordTile extends QSTileImpl<BooleanState> {
         } else if (mMode == SCREEN_RECORD_MID_QUALITY) {
             mMode = SCREEN_RECORD_HIGH_QUALITY;
         } else if (mMode == SCREEN_RECORD_HIGH_QUALITY) {
+            mMode = SCREEN_RECORD_ULTRA_QUALITY;
+        } else if (mMode == SCREEN_RECORD_ULTRA_QUALITY) {
             mMode = SCREEN_RECORD_LOW_QUALITY;
         }
         Settings.System.putIntForUser(mContext.getContentResolver(),
@@ -111,6 +114,9 @@ public class ScreenrecordTile extends QSTileImpl<BooleanState> {
         } else if (mMode == SCREEN_RECORD_HIGH_QUALITY) {
             state.label = mContext.getString(R.string.quick_settings_screenrecord_hq_label);
             state.icon = ResourceIcon.get(R.drawable.ic_qs_screenrecord_hq);
+        } else if (mMode == SCREEN_RECORD_ULTRA_QUALITY) {
+            state.label = mContext.getString(R.string.quick_settings_screenrecord_ultra_label);
+            state.icon = ResourceIcon.get(R.drawable.ic_qs_screenrecord_ultra);
         }
     }
 }

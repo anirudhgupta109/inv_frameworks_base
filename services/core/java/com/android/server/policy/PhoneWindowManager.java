@@ -113,6 +113,7 @@ import static android.view.WindowManager.LayoutParams.isSystemAlertWindowType;
 import static android.view.WindowManager.SCREEN_RECORD_LOW_QUALITY;
 import static android.view.WindowManager.SCREEN_RECORD_MID_QUALITY;
 import static android.view.WindowManager.SCREEN_RECORD_HIGH_QUALITY;
+import static android.view.WindowManager.SCREEN_RECORD_ULTRA_QUALITY;
 import static android.view.WindowManager.TAKE_SCREENSHOT_FULLSCREEN;
 import static android.view.WindowManager.TAKE_SCREENSHOT_SELECTED_REGION;
 import static android.view.WindowManagerGlobal.ADD_OKAY;
