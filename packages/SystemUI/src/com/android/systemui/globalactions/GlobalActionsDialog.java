@@ -14,6 +14,7 @@
 
 package com.android.systemui.globalactions;
 
+import com.android.internal.util.gzosp.GzospUtils;
 import com.android.internal.R;
 import com.android.internal.colorextraction.ColorExtractor;
 import com.android.internal.colorextraction.ColorExtractor.GradientColors;
@@ -689,6 +690,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener, DialogIn
 
         @Override
         public void onPress() {
+            GzospUtils.takeScreenrecord(WindowManager.SCREEN_RECORD_HIGH_QUALITY);
         }
 
         @Override
