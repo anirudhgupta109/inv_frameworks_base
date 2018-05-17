@@ -29,9 +29,12 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.net.ConnectivityManager;
 import android.net.ConnectivityManager;
+import android.os.RemoteException;
 import android.util.DisplayMetrics;
 import android.view.DisplayInfo;
+import android.view.IWindowManager;
 import android.view.WindowManager;
+import android.view.WindowManagerGlobal;
 
 import java.util.List;
 import java.util.Locale;
@@ -177,4 +180,14 @@ public class GzospUtils {
      */
     public static Intent INTENT_LAUNCH_APP = new Intent(Intent.ACTION_MAIN)
             .setClassName(APP_PACKAGE_NAME, APP_PACKAGE_NAME + ".SettingsActivity");
+
+    public static void takeScreenrecord(int mode) {
+        IWindowManager wm = WindowManagerGlobal.getWindowManagerService();
+        try {
+            wm.screenRecordAction(mode);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
