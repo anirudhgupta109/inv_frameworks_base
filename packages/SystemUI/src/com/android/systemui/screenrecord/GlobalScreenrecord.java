@@ -152,6 +152,13 @@ class GlobalScreenrecord {
                     cmds[4] = "--bit-rate";
                     cmds[5] = "8000000";
                     break;
+                case WindowManager.SCREEN_RECORD_ULTRA_QUALITY:
+                    // default resolution (1080p) and 20Mbps
+                    cmds[2] = "--size";
+                    cmds[3] = "1080x1920";
+                    cmds[4] = "--bit-rate";
+                    cmds[5] = "20000000";
+                    break;
             }
 
             try {
@@ -257,6 +264,10 @@ class GlobalScreenrecord {
                 break;
             case WindowManager.SCREEN_RECORD_HIGH_QUALITY:
                 mNotifContent = base + " - 720x1280 @8Mbps";
+                mRecordingStartTime = System.currentTimeMillis();
+                break;
+            case WindowManager.SCREEN_RECORD_ULTRA_QUALITY:
+                mNotifContent = base + " - 1080x1920 @20Mbps";
                 mRecordingStartTime = System.currentTimeMillis();
                 break;
             case -1:

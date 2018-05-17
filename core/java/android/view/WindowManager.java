@@ -165,6 +165,7 @@ public interface WindowManager extends ViewManager {
     final int SCREEN_RECORD_LOW_QUALITY = 0;
     final int SCREEN_RECORD_MID_QUALITY = 1;
     final int SCREEN_RECORD_HIGH_QUALITY = 2;
+    final int SCREEN_RECORD_ULTRA_QUALITY = 3;
 
     /**
      * @hide
