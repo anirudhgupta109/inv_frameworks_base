@@ -70,7 +70,6 @@ public class SignalClusterView extends LinearLayout implements NetworkController
     private static final String SLOT_ETHERNET = "ethernet";
     private static final String SLOT_VPN = "vpn";
     private static final String SLOT_ROAMING = "roaming";
-    private static final String SLOT_VOLTE = "volte";
 
     private final NetworkController mNetworkController;
     private final SecurityController mSecurityController;
@@ -85,7 +84,6 @@ public class SignalClusterView extends LinearLayout implements NetworkController
     private int mEthernetIconId = 0;
     private int mLastEthernetIconId = -1;
     private boolean mWifiVisible = false;
-    private boolean mMobileIms = false;
     private int mWifiStrengthId = 0;
     private int mLastWifiStrengthId = -1;
     private boolean mWifiIn;
@@ -104,7 +102,7 @@ public class SignalClusterView extends LinearLayout implements NetworkController
 
     ViewGroup mEthernetGroup, mWifiGroup;
     View mNoSimsCombo;
-    ImageView mVpn, mEthernet, mWifi, mAirplane, mNoSims, mEthernetDark, mWifiDark, mNoSimsDark, mMobileImsImageView;
+    ImageView mVpn, mEthernet, mWifi, mAirplane, mNoSims, mEthernetDark, mWifiDark, mNoSimsDark;
     ImageView mWifiActivityIn;
     ImageView mWifiActivityOut;
     View mWifiAirplaneSpacer;
@@ -127,7 +125,6 @@ public class SignalClusterView extends LinearLayout implements NetworkController
     private boolean mForceBlockWifi;
     private boolean mBlockRoaming;
     private boolean mBlockVpn;
-    private boolean mBlockVolte;
 
     private final IconLogger mIconLogger = Dependency.get(IconLogger.class);
 
@@ -185,18 +182,16 @@ public class SignalClusterView extends LinearLayout implements NetworkController
         boolean blockMobile = blockList.contains(SLOT_MOBILE);
         boolean blockWifi = blockList.contains(SLOT_WIFI);
         boolean blockEthernet = blockList.contains(SLOT_ETHERNET);
-        boolean blockVolte = blockList.contains(SLOT_VOLTE);
         boolean blockRoaming = blockList.contains(SLOT_ROAMING);
         boolean blockVpn = blockList.contains(SLOT_VPN);
 
         if (blockAirplane != mBlockAirplane || blockMobile != mBlockMobile
-                || blockEthernet != mBlockEthernet || blockWifi != mBlockWifi || blockRoaming != mBlockRoaming || blockVolte != mBlockVolte) {
+                || blockEthernet != mBlockEthernet || blockWifi != mBlockWifi || blockRoaming != mBlockRoaming) {
             mBlockAirplane = blockAirplane;
             mBlockMobile = blockMobile;
             mBlockEthernet = blockEthernet;
             mBlockWifi = blockWifi || mForceBlockWifi;
             mBlockRoaming = blockRoaming;
-            mBlockVolte = blockVolte;
             // Re-register to get new callbacks.
             mNetworkController.removeCallback(this);
             mNetworkController.addCallback(this);
@@ -219,7 +214,6 @@ public class SignalClusterView extends LinearLayout implements NetworkController
         mWifiGroup      = findViewById(R.id.wifi_combo);
         mWifi           = findViewById(R.id.wifi_signal);
         mWifiDark       = findViewById(R.id.wifi_signal_dark);
-        mMobileImsImageView      = (ImageView) findViewById(R.id.ims_hd); 
         mWifiActivityIn = findViewById(R.id.wifi_in);
         mWifiActivityOut= findViewById(R.id.wifi_out);
         mAirplane       = findViewById(R.id.airplane);
@@ -276,7 +270,6 @@ public class SignalClusterView extends LinearLayout implements NetworkController
 
     @Override
     protected void onDetachedFromWindow() {
-        mMobileImsImageView    =null;
         mMobileSignalGroup.removeAllViews();
         Dependency.get(TunerService.class).removeTunable(this);
         mSecurityController.removeCallback(this);
@@ -325,7 +318,7 @@ public class SignalClusterView extends LinearLayout implements NetworkController
     @Override
     public void setMobileDataIndicators(IconState statusIcon, IconState qsIcon, int statusType,
             int qsType, boolean activityIn, boolean activityOut, String typeContentDescription,
-            String description, boolean isWide, int subId, boolean roaming, boolean isMobileIms) {
+            String description, boolean isWide, int subId, boolean roaming) {
         PhoneState state = getState(subId);
         if (state == null) {
             return;
@@ -337,7 +330,6 @@ public class SignalClusterView extends LinearLayout implements NetworkController
         state.mMobileTypeDescription = typeContentDescription;
         state.mIsMobileTypeIconWide = statusType != 0 && isWide;
         state.mRoaming = roaming;
-        mMobileIms = isMobileIms;
         state.mActivityIn = activityIn && mActivityEnabled;
         state.mActivityOut = activityOut && mActivityEnabled;
 
@@ -357,7 +349,6 @@ public class SignalClusterView extends LinearLayout implements NetworkController
     public void setNoSims(boolean show, boolean simDetected) {
         mNoSimsVisible = show && !mBlockMobile;
         mSimDetected = simDetected;
-        mMobileIms = !mNoSimsVisible && mMobileIms;
         apply();
     }
 
@@ -561,15 +552,6 @@ public class SignalClusterView extends LinearLayout implements NetworkController
             mIconLogger.onIconHidden(SLOT_AIRPLANE);
             mAirplane.setVisibility(View.GONE);
         }
-        
-        if (mMobileIms && !mBlockVolte){
-            if (mMobileImsImageView != null)
-                mMobileImsImageView.setVisibility(View.VISIBLE);
-        } else {
-            if (mMobileImsImageView != null)
-                mMobileImsImageView.setVisibility(View.GONE);
-        }
-
 
         if (mIsAirplaneMode && mWifiVisible) {
             mWifiAirplaneSpacer.setVisibility(View.VISIBLE);
@@ -577,7 +559,7 @@ public class SignalClusterView extends LinearLayout implements NetworkController
             mWifiAirplaneSpacer.setVisibility(View.GONE);
         }
 
-        if (((anyMobileVisible && firstMobileTypeId != 0) || mNoSimsVisible || mMobileIms) && mWifiVisible) {
+        if (((anyMobileVisible && firstMobileTypeId != 0) || mNoSimsVisible) && mWifiVisible) {
             mWifiSignalSpacer.setVisibility(View.VISIBLE);
         } else {
             mWifiSignalSpacer.setVisibility(View.GONE);
@@ -644,7 +626,6 @@ public class SignalClusterView extends LinearLayout implements NetworkController
 
     private void applyIconTint() {
         setTint(mVpn, DarkIconDispatcher.getTint(mTintArea, mVpn, mIconTint));
-        setTint(mMobileImsImageView, DarkIconDispatcher.getTint(mTintArea, mMobileImsImageView, mIconTint));
         setTint(mAirplane, DarkIconDispatcher.getTint(mTintArea, mAirplane, mIconTint));
         applyDarkIntensity(
                 DarkIconDispatcher.getDarkIntensity(mTintArea, mNoSims, mDarkIntensity),
