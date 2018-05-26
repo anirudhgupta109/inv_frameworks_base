@@ -857,7 +857,7 @@ final class DefaultPermissionGrantPolicy {
 
             // Invictrix Updater
             PackageParser.Package invUpdatePackage = getSystemPackageLPr(
-                    "com.invictrixrom.updater");
+                    "org.lineageos.updater");
             if (invUpdatePackage != null && doesPackageSupportRuntimePermissions(invUpdatePackage)) {
                 grantRuntimePermissionsLPw(invUpdatePackage, STORAGE_PERMISSIONS, true, userId);
             }
