@@ -55,4 +55,9 @@
     <color name="power_menu_screenshot">#ff202020</color>
     <color name="power_menu_airplane">#ff202020</color>
 
+    <!-- Generic colors -->
+    <color name="generic_theme_primary">#4285f4</color>
+    <color name="generic_theme_primary_dark">#346AC3</color>
+    <color name="generic_theme_accent">#3B77DB</color>
+
 </resources>
