@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Copyright (C) 2012-2017 The Dirty Unicorns Project
+  Copyright (C) 2006-2018 The Android Open Source Project
+  Copyright (C) 2018 Invictrix ROM
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -15,7 +16,31 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
+
 <resources>
+
+    <!-- Powersave warning color -->
+    <color name="powersave_warning_color">#ff8e0101</color> <!-- rgb 142 1 1 -->
+
+    <!-- Screenshot action colors -->
+    <color name="screenshot_flash_color">#b3adadad</color> <!-- light grey with some transparency -->
+    <color name="screenshot_background_color">@android:color/black</color>
+
+     <!-- Floating action button -->
+     <color name="fab_color">@*android:color/accent_device_default_light</color>
+     <color name="floating_action_button_icon_color">@android:color/white</color>
+
+    <!-- Additional power menu -->
+    <color name="power_menu_airplane_on">#ff202020</color>
+    <color name="power_menu_airplane_off">#ff202020</color>
+    <color name="power_menu_sound_panel">#ff202020</color>
+    <color name="power_menu_record_screen">#ff202020</color>
+    <color name="power_menu_kill_task">#ff202020</color>
+    <color name="power_menu_google_assist">#ff202020</color>
+    <color name="power_menu_screen_off">#ff202020</color>
+    <color name="power_menu_actions">#ff202020</color>
+    <color name="power_menu_actions_back">#ff202020</color>
+    <color name="power_menu_settings">#ff202020</color>
 
     <!-- Zen QS panel -->
     <color name="zen_qs_panel_close_button_color">@android:color/white</color>

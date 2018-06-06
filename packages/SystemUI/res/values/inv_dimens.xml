@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Copyright (C) 2016 The OmniROM Project
+  Copyright (C) 2006-2018 The Android Open Source Project
+  Copyright (C) 2018 Invictrix ROM
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -15,7 +16,9 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
+
 <resources>
+
     <!-- QS Brightness control padding -->
     <dimen name="qs_brightness_footer_padding">12dp</dimen>
     <dimen name="qs_footer_padding_top">7dp</dimen>
