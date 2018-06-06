@@ -71,4 +71,10 @@
     <!-- Path to fast charging status file to detect whether an oem fast charger is active -->
     <java-symbol type="array" name="config_oemFastChargerStatusPaths" />
 
+    <!-- Screen pinning toast -->
+    <java-symbol type="color" name="screen_pinning_toast_dark_background_color" />
+    <java-symbol type="color" name="screen_pinning_toast_dark_text_color" />
+    <java-symbol type="color" name="screen_pinning_toast_light_background_color" />
+    <java-symbol type="color" name="screen_pinning_toast_light_text_color" />
+
 </resources>
