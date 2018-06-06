@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2006-2018 The Android Open Source Project
+  Copyright (C) 2018 Invictrix ROM
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<resources>
+
+    <!-- System fonts -->
+    <java-symbol type="array" name="config_fontPackages" />
+
+    <!-- Full screen aspect ratio -->
+    <java-symbol type="bool" name="config_haveHigherAspectRatioScreen" />
+    <java-symbol type="dimen" name="config_screenAspectRatio" />
+
+    <!-- Forcefully tint notification icon text -->
+    <java-symbol type="bool" name="config_useDarkBgNotificationTinting_override" />
+    <java-symbol type="bool" name="config_notificationTinting_override" />
+
+    <!-- Power menu items -->
+    <java-symbol type="color" name="power_menu_power_off" />
+    <java-symbol type="color" name="power_menu_restart" />
+    <java-symbol type="color" name="power_menu_restart_advanced" />
+    <java-symbol type="color" name="power_menu_hot_reboot" />
+    <java-symbol type="color" name="power_menu_advanced_bootloader" />
+    <java-symbol type="color" name="power_menu_advanced_recovery" />
+    <java-symbol type="color" name="power_menu_advanced_system_restart_ui" />
+    <java-symbol type="color" name="power_menu_screenshot" />
+
+    <!-- Generic colors -->
+    <java-symbol type="color" name="generic_theme_primary" />
+    <java-symbol type="color" name="generic_theme_primary_dark" />
+    <java-symbol type="color" name="generic_theme_accent" />
+
+    <!-- System clock for rotation sensor -->
+    <java-symbol type="bool" name="config_useSystemClockforRotationSensor" />
+
+    <!-- Package Manager -->
+    <java-symbol type="array" name="config_disabledComponents" />
+    <java-symbol type="array" name="config_forceEnabledComponents" />
+
+    <!-- Usb drive persistent notification -->
+    <java-symbol type="bool" name="config_persistUsbDriveNotification" />
+
+    <!-- Doze always on default value -->
+    <java-symbol type="bool" name="config_dozeAlwaysOnDisplayEnabledDefault" />
+
+    <!-- Hardware key binding -->
+    <java-symbol type="integer" name="config_deviceHardwareKeys" />
+
+    <!-- Button brightness -->
+    <java-symbol type="bool" name="config_button_brightness_support" />
+    <java-symbol type="integer" name="config_button_brightness_default" />
+
+    <!-- Power menu -->
+    <java-symbol type="array" name="config_custom_globalActionsList" />
+
+    <!-- Path to fast charging status file to detect whether an oem fast charger is active -->
+    <java-symbol type="array" name="config_oemFastChargerStatusPaths" />
+
+</resources>
