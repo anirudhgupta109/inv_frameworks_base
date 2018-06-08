@@ -620,6 +620,7 @@ public class StatusBar extends SystemUI implements DemoMode,
             new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER);
 
     private Entry mEntryToRefresh;
+    private NotificationManager mNoMan;
     private String[] mNavMediaArrowsExcludeList;
     private MediaSessionManager mMediaSessionManager;
     private MediaController mMediaController;
@@ -668,7 +669,7 @@ public class StatusBar extends SystemUI implements DemoMode,
                 || PlaybackState.STATE_BUFFERING ==
                 getMediaControllerPlaybackState(mMediaController)) {
             tickTrackInfo(mMediaController);
-            mNoMan.setMediaPlaying(true);
+            mNavigationBar.setMediaPlaying(true);
             final String currentPkg = mMediaController.getPackageName().toLowerCase();
             for (String packageName : mNavMediaArrowsExcludeList) {
                 if (currentPkg.contains(packageName)) {
@@ -684,33 +685,12 @@ public class StatusBar extends SystemUI implements DemoMode,
             if (isAmbientContainerAvailable()) {
                 ((AmbientIndicationContainer)mAmbientIndicationContainer).hideIndication();
             }
-            mNoMan.setMediaPlaying(false);
+            mNavigationBar.setMediaPlaying(false);
             if (mNavigationBar != null) {
                 setMediaPlaying();
             }
         }
-    };
-
-	public void setMediaPlaying() {
-		if (PlaybackState.STATE_PLAYING == getMediaControllerPlaybackState(mMediaController)
-				|| PlaybackState.STATE_BUFFERING == getMediaControllerPlaybackState(mMediaController)) {
-			tickTrackInfo(mMediaController);
-			final String currentPkg = mMediaController.getPackageName().toLowerCase();
-			for (String packageName : mNavMediaArrowsExcludeList) {
-				if (currentPkg.contains(packageName)) {
-					return;
-				}
-			}
-			if (mNavigationBar != null) {
-				// pulse colors already set by titckTrackInfo
-				mNavigationBar.setMediaPlaying(true);
-			}
-		} else {
-			if (mNavigationBar != null) {
-				mNavigationBar.setMediaPlaying(false);
-			}
-		}
-	}
+    }
 
 	private void tickTrackInfo(MediaController mc) {
 		ArrayList<Entry> activeNotifications = mNotificationData.getAllNotifications();
@@ -1210,6 +1190,11 @@ public class StatusBar extends SystemUI implements DemoMode,
                     R.id.header_debug_info);
             mNotificationPanelDebugText.setVisibility(View.VISIBLE);
         }
+
+        mNoMan = (NotificationManager)
+                        mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        setMediaPlaying();
 
         boolean showNav = Settings.Secure.getInt(mContext.getContentResolver(),
                 Settings.Secure.NAVIGATION_BAR_VISIBLE,
@@ -1952,7 +1937,6 @@ public class StatusBar extends SystemUI implements DemoMode,
             final int[] colors = {n.backgroundColor, n.foregroundColor,
                     n.primaryTextColor, n.secondaryTextColor};
             if (mNavigationBar != null) {
-                Notification n = entry.notification.getNotification();
                 mNavigationBar.setPulseColors(n.isColorizedMedia(), colors);
             }
         }
